@@ -2,16 +2,31 @@ cmake_minimum_required(VERSION 3.12)
 
 # Pull in SDK (must be before project)
 include($ENV{PICO_SDK_PATH}/external/pico_sdk_import.cmake)
-#include($ENV{PICO_SDK_PATH}\\external\\pico_extras_import_optional.cmake)
 
 project(PicoWOL)
 set(PICO_BOARD pico_w)
 
 pico_sdk_init()
 
-add_executable(${PROJECT_NAME} main.c)
+file(GLOB ALL_FILES
+    "src/wol/wol.c"
+)
 
-target_link_libraries(${PROJECT_NAME} pico_stdlib pico_cyw43_arch_none)
+add_executable(${PROJECT_NAME} src/main.c ${ALL_FILES})
+
+include_directories(src/wol src)
+
+include_directories(
+    $ENV{PICO_SDK_PATH}/lib/lwip/contrib/ports/freertos/include/
+)
+
+set(PICO_SDK_TOOLS
+    pico_stdlib 
+    pico_cyw43_arch_lwip_poll
+)
+
+target_link_libraries(${PROJECT_NAME} ${PICO_SDK_TOOLS})
+
 
 # enable usb output, disable uart output
 pico_enable_stdio_usb(${PROJECT_NAME} 1)
