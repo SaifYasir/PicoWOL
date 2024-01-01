@@ -16,4 +16,7 @@ typedef struct __machine
     uint8_t mac_address[6];
 } machine;
 
-char* get_magic_packet(machine* machine);
+/**
+ * Constructs magic packet for use, packet arg size should be 102
+*/
+uint8_t* get_magic_packet(machine* machine, uint8_t* packet);

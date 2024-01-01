@@ -2,8 +2,7 @@
 
 #include "wol.h"
 
-char* get_magic_packet(machine* machine){
-    uint8_t packet[MAGIC_PACKET_BYTES];
+uint8_t* get_magic_packet(machine* machine, uint8_t* packet){
     for (int i = 0; i < 6; i++)
     {
         packet[i] = UINT8_MAX;
@@ -13,6 +12,4 @@ char* get_magic_packet(machine* machine){
         packet[i] = machine->mac_address[i % 6];
     }
     return packet;
-
-    //FIX THE LOCAL VARIABLE PACKET WILL GET DESTROYED
 }
