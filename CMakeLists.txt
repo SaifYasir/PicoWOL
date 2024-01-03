@@ -23,6 +23,7 @@ include_directories(
 include_directories(
     src/wol 
     src/wifi
+    src/button
     src
 )
 
