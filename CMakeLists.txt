@@ -24,6 +24,7 @@ include_directories(
     src/wol 
     src/wifi
     src/button
+    src/flash
     src
 )
 
@@ -31,6 +32,7 @@ set(PICO_SDK_TOOLS
     pico_stdlib 
     pico_cyw43_arch_lwip_poll
     hardware_i2c
+    hardware_spi
 )
 
 target_link_libraries(${PROJECT_NAME} ${PICO_SDK_TOOLS})

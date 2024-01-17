@@ -82,8 +82,8 @@ void lcd_clear(){
 }
 
 /*
- *  0X80 is the beginning of the first line
- *  0XC0 is the begginning of the second line
+ *  0X80 is the beginning of the first line, use line number 0
+ *  0XC0 is the begginning of the second line, use line number 1
 */
 void lcd_set_cursor(int line, int position){
     int set_cursor_pos = (line == 0) ? 0x80 + position : 0xC0 + position;
