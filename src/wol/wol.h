@@ -15,7 +15,7 @@ typedef struct __machine{
 } machine;
 
 typedef struct __machine_stack{
-    machine value;
+    machine* value;
     struct __machine_stack* next_machine;
 } machine_stack;
 
@@ -27,4 +27,7 @@ uint8_t* get_magic_packet(machine* machine, uint8_t* packet);
 machine_stack* push_to_machine_stack(machine_stack* stack, machine* value);
 machine* pop_machine_stack(machine_stack** stack);
 
+machine_stack** create_machine_stack(machine_stack** stack);
 void clear_machine_stack(machine_stack** stack);
+
+uint8_t get_machine_stack_size(machine_stack* stack);

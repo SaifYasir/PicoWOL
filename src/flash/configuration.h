@@ -1,8 +1,12 @@
 #pragma once
 
+#include "hardware/spi.h"
+
 /*
     This program implements SPI to interface with flash storage devices
 */
+
+#define FLASH_SPI_INSTANCE          spi1
 
 #define FLASH_SPI_CSN_GPIO          13
 #define FLASH_SPI_RX_GPIO           12
