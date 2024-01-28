@@ -2,8 +2,12 @@
 #include "pico/cyw43_arch.h"
 
 #include "wifi.h"
-
 #include "wol/wol.h"
+
+#include "lwip/pbuf.h"
+#include "lwip/udp.h"
+#include "lwip/netif.h"
+#include "lwip/ip4.h"
 
 
 int start_wifi(wifi_credential* wifi_credential){
@@ -25,10 +29,11 @@ int send_wol_packet(machine* machine){
     }
 
     ip_addr_t target_addr;
-
-    //find a way to put broadcast address here
-    ip4addr_aton("",&target_addr);
-    udp_connect(pcb,&target_addr,7);
+    ip_addr_t broadcast_address;
+    
+    // get broadcast address
+    broadcast_address.addr = (netif_default->ip_addr.addr & netif_default->netmask.addr) | ~netif_default->netmask.addr;
+    udp_connect(pcb,&broadcast_address,7);
 
     struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT,MAGIC_PACKET_BYTES,PBUF_RAM);
     pbuf_take(p,wol_packet,MAGIC_PACKET_BYTES);

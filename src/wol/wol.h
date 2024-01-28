@@ -11,6 +11,7 @@ typedef struct __wifi_credential{
 } wifi_credential;
 
 typedef struct __machine{
+    char* machine_name;
     uint8_t mac_address[6];
 } machine;
 
@@ -26,6 +27,7 @@ uint8_t* get_magic_packet(machine* machine, uint8_t* packet);
 
 machine_stack* push_to_machine_stack(machine_stack* stack, machine* value);
 machine* pop_machine_stack(machine_stack** stack);
+machine* get_machine_at_index(machine_stack* stack, uint8_t index);
 
 machine_stack** create_machine_stack(machine_stack** stack);
 void clear_machine_stack(machine_stack** stack);

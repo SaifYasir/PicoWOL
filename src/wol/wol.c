@@ -88,3 +88,18 @@ uint8_t get_machine_stack_size(machine_stack* stack){
     }
     return stack_size;
 }
+
+machine* get_machine_at_index(machine_stack* stack, uint8_t index){
+    if(stack == NULL){
+        return NULL;
+    }
+    uint8_t stack_size = 0;
+    while(stack_size != index){
+        if(stack->next_machine == NULL){
+            return NULL;
+        }
+        stack = stack->next_machine;
+        stack_size++;
+    }
+    return stack->value;
+}
