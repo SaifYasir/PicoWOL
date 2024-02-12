@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include "wol/wol.h"
+
 // Change configuration file for different pin configurations
 #include "display/configuration.h"
 
@@ -21,3 +23,9 @@ void display_i2c_lcd_init();
 void lcd_clear();
 void lcd_set_cursor(int line, int position);
 void lcd_send_string(const char* string);
+
+
+void centre_send_message(char* line_one, char* line_two);
+
+// Leave wol_profile as NULL to use default (default_wol_profiles with machine at index default_selected_wol_profile)
+void display_wol_profile(machine* wol_profile);

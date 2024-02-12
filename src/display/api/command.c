@@ -1,11 +1,22 @@
+#include <string.h>
+
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 
 #include "command.h"
 
-#include "stdio.h" //REMOVE LATER
-
+void i2c_write_byte(uint8_t val);
+void lcd_toggle_enable(uint8_t val);
+void lcd_send_byte(uint8_t val, int mode);
+void display_i2c_pico_init();
+void display_i2c_lcd_init();
+void lcd_clear();
+void lcd_set_cursor(int line, int position);
+void lcd_send_char(char val);
+void lcd_send_string(const char* string);
+void centre_send_message(char* line_one, char* line_two);
+void display_wol_profile(machine* wol_profile);
 
 void i2c_write_byte(uint8_t val){
     if(LCD_I2C_INSTANCE == 0){
@@ -22,9 +33,9 @@ void i2c_write_byte(uint8_t val){
 * and the LCD to stop reading
 */
 void lcd_toggle_enable(uint8_t val){
-    sleep_us(DELAY_US);
+    busy_wait_us(DELAY_US);
     i2c_write_byte(val | LCD_ENABLE_BIT);
-    sleep_us(DELAY_US);
+    busy_wait_us(DELAY_US);
     i2c_write_byte(val | ~LCD_ENABLE_BIT);
 }
 
@@ -97,5 +108,26 @@ void lcd_send_char(char val) {
 void lcd_send_string(const char* string){
     while (*string){
         lcd_send_char(*string++);
+    }
+}
+
+
+void centre_send_message(char* line_one, char* line_two){
+    lcd_clear();
+    lcd_set_cursor(0,(LCD_MAX_CHARS/2) - (strlen(line_one) / 2));
+    lcd_send_string(line_one);
+
+    lcd_set_cursor(1,(LCD_MAX_CHARS/2) - (strlen(line_two) / 2));
+    lcd_send_string(line_two);
+}
+
+void display_wol_profile(machine* wol_profile){
+    centre_send_message("hello","there");
+    if(wol_profile == NULL){
+        machine* wol_selected = get_machine_at_index(default_wol_profiles,default_selected_wol_profile);
+        centre_send_message(wol_selected->machine_name,"");
+    }
+    else{
+        centre_send_message(wol_profile->machine_name,"");
     }
 }

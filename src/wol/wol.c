@@ -2,6 +2,20 @@
 
 #include "wol.h"
 
+
+uint8_t* get_magic_packet(machine* machine, uint8_t* packet);
+machine_stack** push_to_machine_stack(machine_stack** stack, machine* value);
+machine* pop_machine_stack(machine_stack** stack);
+void clear_machine_stack(machine_stack** stack);
+uint8_t get_machine_stack_size(machine_stack* stack);
+machine* get_machine_at_index(machine_stack* stack, uint8_t index);
+void init_wol(void);
+
+// stack used for wol profiles
+machine_stack* default_wol_profiles = NULL;
+uint8_t default_selected_wol_profile = 0;
+wifi_credential default_wifi_credentials;
+
 uint8_t* get_magic_packet(machine* machine, uint8_t* packet){
     for (int i = 0; i < 6; i++)
     {
@@ -14,24 +28,14 @@ uint8_t* get_magic_packet(machine* machine, uint8_t* packet){
     return packet;
 }
 
-machine_stack** create_machine_stack(machine_stack** stack){
-    (*stack) = malloc(sizeof(machine_stack));
-    (*stack)->value = NULL;
-    (*stack)->next_machine = NULL;
-    return stack;
-}
-
-
-machine_stack* push_to_machine_stack(machine_stack* stack, machine* value){
-    if(stack->value == NULL){
-        stack->value=value;
+machine_stack** push_to_machine_stack(machine_stack** stack, machine* value){
+    if((*stack) == NULL){
+        (*stack) = malloc(sizeof(machine_stack));
+        (*stack)->value = value;
+        (*stack)->next_machine = NULL;
         return stack;
-        // stack = malloc(sizeof(machine_stack));
-        // stack->value = value;
-        // stack->next_machine = NULL;
-        // return stack;
     }
-    machine_stack* node = stack;
+    machine_stack* node = *stack;
     while (node->next_machine != NULL)
     {
         node = node->next_machine;
@@ -61,7 +65,7 @@ machine* pop_machine_stack(machine_stack** stack){
 
     // only 1 value in the stack
     if(previous_val == current_val){
-        stack = NULL;
+        *stack = NULL;
     }
 
     free(current_val);
@@ -79,7 +83,7 @@ void clear_machine_stack(machine_stack** stack){
 
 uint8_t get_machine_stack_size(machine_stack* stack){
     if(stack == NULL){
-        return NULL;
+        return 0;
     }
     uint8_t stack_size = 1;
     while(stack->next_machine != NULL){
