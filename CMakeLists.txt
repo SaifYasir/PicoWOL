@@ -23,6 +23,8 @@ include_directories(
     $ENV{PICO_SDK_PATH}/lib/lwip/contrib/ports/freertos/include/
 )
 
+target_compile_definitions(${PROJECT_NAME} PUBLIC PICO_MAX_SHARED_IRQ_HANDLERS=5)
+
 include_directories(
     src/wol 
     src/wifi
