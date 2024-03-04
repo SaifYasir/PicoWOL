@@ -22,17 +22,19 @@ typedef struct __machine_stack{
 
 extern machine_stack* default_wol_profiles;
 extern uint8_t default_selected_wol_profile;
-extern wifi_credential default_wifi_credentials;
+extern wifi_credential* default_wifi_credentials;
 
 /**
  * Constructs magic packet for use, packet arg size should be 102
 */
 uint8_t* get_magic_packet(machine* machine, uint8_t* packet);
 
+machine* create_machine(const char* machine_name, const uint8_t mac_address[6]);
+void destroy_machine();
+
 machine_stack** push_to_machine_stack(machine_stack** stack, machine* value);
 machine* pop_machine_stack(machine_stack** stack);
 machine* get_machine_at_index(machine_stack* stack, uint8_t index);
 
 void clear_machine_stack(machine_stack** stack);
-
 uint8_t get_machine_stack_size(machine_stack* stack);

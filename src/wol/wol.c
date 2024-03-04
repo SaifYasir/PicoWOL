@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "wol.h"
 
@@ -10,11 +11,13 @@ void clear_machine_stack(machine_stack** stack);
 uint8_t get_machine_stack_size(machine_stack* stack);
 machine* get_machine_at_index(machine_stack* stack, uint8_t index);
 void init_wol(void);
+machine* create_machine(const char* machine_name, const uint8_t mac_address[6]);
+void destroy_machine();
 
 // stack used for wol profiles
 machine_stack* default_wol_profiles = NULL;
 uint8_t default_selected_wol_profile = 0;
-wifi_credential default_wifi_credentials;
+wifi_credential* default_wifi_credentials = NULL;
 
 uint8_t* get_magic_packet(machine* machine, uint8_t* packet){
     for (int i = 0; i < 6; i++)
@@ -60,16 +63,14 @@ machine* pop_machine_stack(machine_stack** stack){
     }
     previous_val->next_machine = NULL;
 
-    machine* new_machine = malloc(sizeof(machine));
-    *new_machine = *current_val->value;
+    machine* return_val = current_val->value;
 
     // only 1 value in the stack
     if(previous_val == current_val){
         *stack = NULL;
     }
-
     free(current_val);
-    return new_machine;
+    return return_val;
 }
 
 void clear_machine_stack(machine_stack** stack){
@@ -77,7 +78,8 @@ void clear_machine_stack(machine_stack** stack){
         return;
     }
     while(stack != NULL){
-      pop_machine_stack(stack);
+      machine* popped_machine = pop_machine_stack(stack);
+      free(popped_machine);
     }
 }
 
@@ -106,4 +108,18 @@ machine* get_machine_at_index(machine_stack* stack, uint8_t index){
         stack_size++;
     }
     return stack->value;
+}
+
+machine* create_machine(const char* machine_name, const uint8_t mac_address[6]){
+    machine* new_machine = malloc(sizeof(machine));
+    if(new_machine != NULL){
+        char* new_machine_name = malloc(strlen(machine_name) + 1);
+        new_machine->machine_name = new_machine_name;
+        memcpy(new_machine->mac_address,mac_address,sizeof(mac_address));
+    }
+    return new_machine;
+}
+
+void destroy_machine(){
+//cry
 }

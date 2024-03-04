@@ -53,8 +53,6 @@ void sd_card_read_and_initialise_wol_profiles(){
         new_wol_profile->machine_name = parse_csv_line(line,1);
         char* second_line = parse_csv_line(line,2);
         hex_string_to_byte_array(second_line,new_wol_profile->mac_address,sizeof(new_wol_profile->mac_address));
-        //figure out why it errors
-        //free(second_line);
         push_to_machine_stack(&default_wol_profiles,new_wol_profile);
     }
     result = f_close(&wol_profiles_file);

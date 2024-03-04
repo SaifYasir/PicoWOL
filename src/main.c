@@ -1,12 +1,69 @@
 #include <stdio.h>
+
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
+#include "pico/binary_info.h"
+
+#include "hardware/i2c.h"
+#include "hardware/gpio.h"
+#include "hardware/spi.h"
+
+#include "lwip/pbuf.h"
+#include "lwip/udp.h"
+
+#include "wol/wol.h"
+#include "display/api/command.h"
+#include "wifi/wifi.h"
+#include "button/button.h"
+#include "flash/flash.h"
+
+char *INTRODUCTION_MSG[] = {"Pico","Wake On Lan"};
 
 int main(){
-    stdio_init_all();
+    if(!stdio_init_all()){
+        printf("Standard IO could not be initialised! \n");
+    }
     if (cyw43_arch_init()) {
-        printf("Wi-Fi init failed");
+        printf("Wi-Fi initialisation failed! \n");
         return -1;
     }
-    cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
+
+    display_i2c_pico_init();
+    display_i2c_lcd_init();
+
+    // Tell user Pico is loading
+    centre_send_message("Pico","Loading");
+
+    //configure wol list
+    initialise_sd_card();
+    sd_card_read_and_initialise_wifi_credentials();
+
+    if(start_wifi(default_wifi_credentials) != 0){
+        printf("Connection to device failure, attempting again... \n");
+        if(start_wifi(default_wifi_credentials) != 0){
+            printf("Connection failed again, terminating! \n");
+            return -1;
+        }
+    }
+
+    //configure wol list
+    sd_card_read_and_initialise_wol_profiles();
+
+    // Load button interrupts
+    initialise_left_btn();
+    initialise_right_btn();
+    initialise_accept_btn();
+
+    // Show introduction message
+    centre_send_message(INTRODUCTION_MSG[0],INTRODUCTION_MSG[1]);
+    sleep_ms(1000);
+
+    display_wol_profile(NULL);
+
+    while(true){
+        sleep_ms(1000);
+        poll_udp_packets(&default_udp_polling_machine_stack);
+    }
+
+    clear_machine_stack(&default_wol_profiles);
 }
