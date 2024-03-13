@@ -30,7 +30,7 @@ extern wifi_credential* default_wifi_credentials;
 uint8_t* get_magic_packet(machine* machine, uint8_t* packet);
 
 machine* create_machine(const char* machine_name, const uint8_t mac_address[6]);
-void destroy_machine();
+void destroy_machine(machine* machine_to_destroy);
 
 machine_stack** push_to_machine_stack(machine_stack** stack, machine* value);
 machine* pop_machine_stack(machine_stack** stack);

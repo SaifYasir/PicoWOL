@@ -120,6 +120,6 @@ machine* create_machine(const char* machine_name, const uint8_t mac_address[6]){
     return new_machine;
 }
 
-void destroy_machine(){
+void destroy_machine(machine* machine_to_destroy){
 //cry
 }

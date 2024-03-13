@@ -34,6 +34,7 @@ include_directories(
 )
 
 set(PICO_SDK_TOOLS
+    pico_multicore
     pico_stdlib 
     pico_cyw43_arch_lwip_poll
     hardware_i2c

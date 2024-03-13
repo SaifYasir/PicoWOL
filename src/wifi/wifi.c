@@ -1,5 +1,6 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
+#include "pico/util/queue.h"
 
 #include "wifi.h"
 #include "wol/wol.h"
@@ -10,7 +11,7 @@
 #include "lwip/ip4.h"
 
 
-machine_stack* default_udp_polling_machine_stack = NULL;
+queue_t* default_udp_polling_machine_queue;
 
 int start_wifi(wifi_credential* wifi_credential){
     cyw43_arch_enable_sta_mode();
@@ -48,10 +49,21 @@ int send_wol_packet(machine* machine){
     return er;
 }
 
-void poll_udp_packets(machine_stack** machine_stack){
-    int stack_size = get_machine_stack_size(*machine_stack);;
-    for(int i = 0; i < stack_size; i++){
-        machine* machine_to_wake = pop_machine_stack(machine_stack);
-        send_wol_packet(machine_to_wake);
+void initialise_polling_queue(queue_t** queue){
+   *queue = malloc(sizeof(machine) * MAX_QUEUE_WOL);
+   queue_init_with_spinlock(*queue,sizeof(machine),MAX_QUEUE_WOL,QUEUE_SPINLOCK_ID);
+}
+
+void push_to_polling_queue(queue_t* queue, machine* machine){
+    queue_try_add(queue,machine);
+}
+
+void poll_udp_packets(queue_t* machine_queue){
+    int queue_size = queue_get_level(machine_queue);
+    for (int i = 0; i < queue_size; i++)
+    {
+        machine machine_to_wake;
+        queue_remove_blocking(machine_queue,&machine_to_wake);
+        send_wol_packet(&machine_to_wake);
     }
 }

@@ -39,7 +39,7 @@ void accept_btn_callback(void){
         machine* wol_selected = get_machine_at_index(default_wol_profiles,default_selected_wol_profile);
 
         // push to wol udp stack
-        push_to_machine_stack(&default_udp_polling_machine_stack,wol_selected);
+        push_to_polling_queue(default_udp_polling_machine_queue,wol_selected);
 
         //display sent message?
         char* sent_message = "WOL SENT!";
