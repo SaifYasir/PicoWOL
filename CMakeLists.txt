@@ -23,7 +23,7 @@ include_directories(
     $ENV{PICO_SDK_PATH}/lib/lwip/contrib/ports/freertos/include/
 )
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC PICO_MAX_SHARED_IRQ_HANDLERS=5)
+target_compile_definitions(${PROJECT_NAME} PUBLIC PICO_MAX_SHARED_IRQ_HANDLERS=6)
 
 include_directories(
     src/wol 
@@ -34,9 +34,8 @@ include_directories(
 )
 
 set(PICO_SDK_TOOLS
-    pico_multicore
     pico_stdlib 
-    pico_cyw43_arch_lwip_poll
+    pico_cyw43_arch_lwip_threadsafe_background
     hardware_i2c
     hardware_spi
 )

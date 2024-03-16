@@ -21,6 +21,22 @@ int start_wifi(wifi_credential* wifi_credential){
         CYW43_AUTH_WPA2_AES_PSK);
 }
 
+int pico_get_port_number(){
+    return UDP_PORT_NUMBER;
+}
+
+void pico_get_mac_address(uint8_t mac[6]){
+    cyw43_wifi_get_mac(&cyw43_state,CYW43_ITF_STA,mac);
+}
+
+void pico_get_ip_address(char* data){
+    u32_t addr = netif_default->ip_addr.addr  & netif_default->netmask.addr;
+    ip4_addr_t* ip_address = netif_ip4_addr(netif_default);
+    char* ip_address_str = ipaddr_ntoa(ip_address);
+    memcpy(data,ip_address_str,strlen(ip_address_str) + 1);
+}
+
+
 int send_wol_packet(machine* machine){
     uint8_t wol_packet[MAGIC_PACKET_BYTES];
     get_magic_packet(machine,wol_packet);
@@ -36,7 +52,7 @@ int send_wol_packet(machine* machine){
     
     // get broadcast address
     broadcast_address.addr = (netif_default->ip_addr.addr & netif_default->netmask.addr) | ~netif_default->netmask.addr;
-    udp_connect(pcb,&broadcast_address,7);
+    udp_connect(pcb,&broadcast_address,UDP_PORT_NUMBER);
 
     struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT,MAGIC_PACKET_BYTES,PBUF_RAM);
     pbuf_take(p,wol_packet,MAGIC_PACKET_BYTES);

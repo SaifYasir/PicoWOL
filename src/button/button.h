@@ -10,6 +10,7 @@ extern uint8_t BUTTON_FLAG;
 void initialise_left_btn();
 void initialise_right_btn();
 void initialise_accept_btn();
+void initialise_info_btn();
 
 
 void disable_all_buttons();

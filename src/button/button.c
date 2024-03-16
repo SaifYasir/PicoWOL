@@ -48,6 +48,19 @@ void accept_btn_callback(void){
     }
 }
 
+// SHOW INFO STATISTICS
+void info_btn_callback(void){
+    if(gpio_get_irq_event_mask(INFO_BTN_GPIO) & BTN_BEHAVIOUR_IRQ){
+        gpio_acknowledge_irq(INFO_BTN_GPIO,BTN_BEHAVIOUR_IRQ);
+
+        char ip_address_str[16];
+        pico_get_ip_address(ip_address_str);
+        lcd_clear();
+        lcd_set_cursor(0,(LCD_MAX_CHARS/2) - (strlen(ip_address_str) / 2));
+        lcd_send_string(ip_address_str);
+    }
+}
+
 void initialise_left_btn(){
     gpio_set_irq_enabled(LEFT_BTN_GPIO,BTN_BEHAVIOUR_IRQ,true);
     gpio_add_raw_irq_handler(LEFT_BTN_GPIO,left_btn_callback);
@@ -62,6 +75,11 @@ void initialise_right_btn(){
 void initialise_accept_btn(){
     gpio_set_irq_enabled(ACCEPT_BTN_GPIO,BTN_BEHAVIOUR_IRQ,true);
     gpio_add_raw_irq_handler(ACCEPT_BTN_GPIO,accept_btn_callback);
+}
+
+void initialise_info_btn(){
+    gpio_set_irq_enabled(INFO_BTN_GPIO,BTN_BEHAVIOUR_IRQ,true);
+    gpio_add_raw_irq_handler(INFO_BTN_GPIO,info_btn_callback);
 }
 
 void disable_all_buttons(){

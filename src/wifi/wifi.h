@@ -7,6 +7,8 @@
 #define MAX_QUEUE_WOL       5
 #define QUEUE_SPINLOCK_ID   1
 
+#define UDP_PORT_NUMBER     7
+
 /**
  * Add to this stack, then poll to wake up devices
 */
@@ -17,3 +19,7 @@ int start_wifi(wifi_credential* wifi_credential);
 void initialise_polling_queue(queue_t** queue);
 void push_to_polling_queue(queue_t* queue, machine* machine);
 void poll_udp_packets(queue_t* machine_queue);
+
+int pico_get_port_number();
+void pico_get_mac_address(uint8_t mac[6]);
+void pico_get_ip_address(char* data);
