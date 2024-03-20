@@ -1,8 +1,10 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 #include "pico/binary_info.h"
+#include "pico/util/queue.h"
 
 #include "hardware/i2c.h"
 #include "hardware/gpio.h"
@@ -10,6 +12,7 @@
 
 #include "lwip/pbuf.h"
 #include "lwip/udp.h"
+#include "lwip/api.h"
 
 #include "wol/wol.h"
 #include "display/api/command.h"
@@ -49,10 +52,23 @@ int main(){
     //configure wol list
     sd_card_read_and_initialise_wol_profiles();
 
-    // Load button interrupts
+    // configure WOL polling queue
+    initialise_polling_queue(&default_udp_polling_machine_queue);
+
+    initialise_accept_btn();
+    initialise_info_btn();
     initialise_left_btn();
     initialise_right_btn();
-    initialise_accept_btn();
+
+    char* mac_addr = malloc(sizeof(char) * 6);
+    pico_get_mac_address(mac_addr);
+
+    char* ip_addr = malloc(sizeof(char) * 30);
+    pico_get_ip_address(ip_addr);
+
+    printf("Port: %d , mac address: %s, ip address: %s",pico_get_port_number(), mac_addr, ip_addr);
+
+    start_udp_server();
 
     // Show introduction message
     centre_send_message(INTRODUCTION_MSG[0],INTRODUCTION_MSG[1]);
@@ -62,7 +78,7 @@ int main(){
 
     while(true){
         sleep_ms(1000);
-        poll_udp_packets(&default_udp_polling_machine_stack);
+        poll_udp_packets(default_udp_polling_machine_queue);
     }
 
     clear_machine_stack(&default_wol_profiles);

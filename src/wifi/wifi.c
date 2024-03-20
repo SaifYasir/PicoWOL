@@ -12,6 +12,15 @@
 
 
 queue_t* default_udp_polling_machine_queue;
+struct udp_pcb* pcb = NULL;
+
+int initialise_udp_pcb(){
+    pcb = udp_new();
+    if(udp_bind(pcb, IP_ADDR_ANY, UDP_PORT_NUMBER) == ERR_USE)
+    {
+        return ERR_USE;
+    }
+}
 
 int start_wifi(wifi_credential* wifi_credential){
     cyw43_arch_enable_sta_mode();
@@ -19,6 +28,39 @@ int start_wifi(wifi_credential* wifi_credential){
         wifi_credential->ssid,
         wifi_credential->ssid_password,
         CYW43_AUTH_WPA2_AES_PSK);
+}
+
+void recieve_packet_server(void *arg, struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port){
+    // Decipher packet into 1 of 3 options,
+    // index, string, mac address
+    printf("Received packet: %s",p->payload);
+    char first_char = *((char*)(p->payload));
+    udp_sendto(pcb,p,addr,port);
+    int response = 0;
+    if (first_char == INDEX_SERVER_DELIMITER)
+    {
+        // assume this means index
+        int index = atoi((char*)(p->payload + 1));
+        machine* machine = get_machine_at_index(default_wol_profiles,index);
+
+        //Add packet to polling thing
+        push_to_polling_queue(default_udp_polling_machine_queue,machine);
+    }
+    else if(response == STRING_SERVER_DELIMITER){
+        //Assume check for string has happened
+        //Implement a check for searching names
+    }
+    else if(first_char == MAC_SERVER_DELIMITER){
+        // assume mac address is given in straight order IE A61421
+    }
+    
+}
+
+int start_udp_server(){
+    if(pcb == NULL){
+        initialise_udp_pcb();
+    }
+    udp_recv(pcb,recieve_packet_server,NULL);
 }
 
 int pico_get_port_number(){
@@ -41,10 +83,8 @@ int send_wol_packet(machine* machine){
     uint8_t wol_packet[MAGIC_PACKET_BYTES];
     get_magic_packet(machine,wol_packet);
 
-    struct udp_pcb* pcb = udp_new();
-    if(udp_bind(pcb, IP_ADDR_ANY, 0) == ERR_USE)
-    {
-        return ERR_USE;
+    if(pcb == NULL){
+        initialise_udp_pcb();
     }
 
     ip_addr_t target_addr;
