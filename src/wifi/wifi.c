@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 #include "pico/util/queue.h"
@@ -13,6 +15,9 @@
 
 queue_t* default_udp_polling_machine_queue;
 struct udp_pcb* pcb = NULL;
+
+int send_wol_packet_string(char* mac_address_string);
+int send_wol_packet(machine* machine);
 
 int initialise_udp_pcb(){
     pcb = udp_new();
@@ -35,22 +40,32 @@ void recieve_packet_server(void *arg, struct udp_pcb *pcb, struct pbuf *p, const
     // index, string, mac address
     printf("Received packet: %s",p->payload);
     char first_char = *((char*)(p->payload));
-    udp_sendto(pcb,p,addr,port);
-    int response = 0;
     if (first_char == INDEX_SERVER_DELIMITER)
     {
         // assume this means index
-        int index = atoi((char*)(p->payload + 1));
+        int index = atoi((char*)(p->payload)+1);
         machine* machine = get_machine_at_index(default_wol_profiles,index);
 
         //Add packet to polling thing
         push_to_polling_queue(default_udp_polling_machine_queue,machine);
     }
-    else if(response == STRING_SERVER_DELIMITER){
-        //Assume check for string has happened
-        //Implement a check for searching names
+    else if(first_char == STRING_SERVER_DELIMITER){
+        uint8_t machine_profile_size = get_machine_stack_size(default_wol_profiles);
+        for (size_t i = 0; i < machine_profile_size; i++)
+        {
+            machine* machine = get_machine_at_index(default_wol_profiles,i);
+            char* machine_name = machine->machine_name;
+            printf("\nString to compare is %s",(char*)(p->payload)+1);
+            printf("\nMachine name is: %s",machine_name);
+
+            printf("Rando output %s",strstr((char*)(p->payload),machine_name));
+            if(strstr(machine_name,(char*)(p->payload) + 1) != NULL){
+                send_wol_packet(machine);
+            }
+        }
     }
     else if(first_char == MAC_SERVER_DELIMITER){
+        send_wol_packet_string((char*)(p->payload)+1);
         // assume mac address is given in straight order IE A61421
     }
     
@@ -101,7 +116,46 @@ int send_wol_packet(machine* machine){
     cyw43_arch_poll();
 
     pbuf_free(p);
-    udp_remove(pcb);
+    udp_disconnect(pcb);
+    return er;
+}
+
+int send_wol_packet_string(char* mac_address_string){
+    uint8_t wol_packet[MAGIC_PACKET_BYTES];
+    uint8_t mac_address[6];
+
+    size_t hex_string_length = strlen(mac_address_string);
+    printf("mac address is %s",mac_address_string);
+    printf("Size is %d",sizeof(mac_address) * 2);
+    if(hex_string_length != (sizeof(mac_address) * 2)){
+       printf("Hex string to byte array invalid input!");
+       return;
+    }
+    for(size_t i = 0; i < hex_string_length; i += 2){
+        sscanf(mac_address_string + i, "%2hhx", &mac_address[i/2]);
+    }
+
+    get_magic_packet_mac_addr(mac_address,wol_packet);
+
+    if(pcb == NULL){
+        initialise_udp_pcb();
+    }
+
+    ip_addr_t target_addr;
+    ip_addr_t broadcast_address;
+    
+    // get broadcast address
+    broadcast_address.addr = (netif_default->ip_addr.addr & netif_default->netmask.addr) | ~netif_default->netmask.addr;
+    udp_connect(pcb,&broadcast_address,UDP_PORT_NUMBER);
+
+    struct pbuf *p = pbuf_alloc(PBUF_TRANSPORT,MAGIC_PACKET_BYTES,PBUF_RAM);
+    pbuf_take(p,wol_packet,MAGIC_PACKET_BYTES);
+    
+    err_t er = udp_send(pcb,p);
+    cyw43_arch_poll();
+
+    pbuf_free(p);
+    udp_disconnect(pcb);
     return er;
 }
 

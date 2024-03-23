@@ -31,6 +31,18 @@ uint8_t* get_magic_packet(machine* machine, uint8_t* packet){
     return packet;
 }
 
+uint8_t* get_magic_packet_mac_addr(uint8_t* machine_mac, uint8_t* packet){
+    for (int i = 0; i < 6; i++)
+    {
+        packet[i] = UINT8_MAX;
+    }
+    for (int i = 6; i < MAGIC_PACKET_BYTES; i++)
+    {
+        packet[i] = machine_mac[i % 6];
+    }
+    return packet;
+}
+
 machine_stack** push_to_machine_stack(machine_stack** stack, machine* value){
     if((*stack) == NULL){
         (*stack) = malloc(sizeof(machine_stack));
