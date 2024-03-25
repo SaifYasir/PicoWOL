@@ -20,8 +20,17 @@
 #include "button/button.h"
 #include "flash/flash.h"
 
+/**
+ * @brief The introduction message the display shows when starting the PICO
+ * 
+ */
 char *INTRODUCTION_MSG[] = {"Pico","Wake On Lan"};
 
+/**
+ * \brief Main entry point to the program
+ * 
+ * Main starts and configures multiple components, such as the peripherals, wifi and running the server
+*/
 int main(){
     if(!stdio_init_all()){
         printf("Standard IO could not be initialised! \n");
