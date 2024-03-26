@@ -8,7 +8,7 @@ uint8_t* get_magic_packet(machine* machine, uint8_t* packet);
 machine_stack** push_to_machine_stack(machine_stack** stack, machine* value);
 machine* pop_machine_stack(machine_stack** stack);
 void clear_machine_stack(machine_stack** stack);
-uint8_t get_machine_stack_size(machine_stack* stack);
+uint8_t get_machine_stack_amount(machine_stack* stack);
 machine* get_machine_at_index(machine_stack* stack, uint8_t index);
 void init_wol(void);
 machine* create_machine(const char* machine_name, const uint8_t mac_address[6]);
@@ -91,11 +91,11 @@ void clear_machine_stack(machine_stack** stack){
     }
     while(stack != NULL){
       machine* popped_machine = pop_machine_stack(stack);
-      free(popped_machine);
+      destroy_machine(popped_machine);
     }
 }
 
-uint8_t get_machine_stack_size(machine_stack* stack){
+uint8_t get_machine_stack_amount(machine_stack* stack){
     if(stack == NULL){
         return 0;
     }

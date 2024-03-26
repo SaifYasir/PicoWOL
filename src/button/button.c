@@ -25,7 +25,7 @@ void left_btn_callback(void){
 void right_btn_callback(void){
     if(gpio_get_irq_event_mask(RIGHT_BTN_GPIO) & BTN_BEHAVIOUR_IRQ){
         gpio_acknowledge_irq(RIGHT_BTN_GPIO,BTN_BEHAVIOUR_IRQ);
-        if(default_selected_wol_profile < get_machine_stack_size(default_wol_profiles) - 1){
+        if(default_selected_wol_profile < get_machine_stack_amount(default_wol_profiles) - 1){
             default_selected_wol_profile++;
             //display move right
             display_wol_profile(NULL);

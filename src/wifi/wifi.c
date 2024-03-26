@@ -50,7 +50,7 @@ void recieve_packet_server(void *arg, struct udp_pcb *pcb, struct pbuf *p, const
         push_to_polling_queue(default_udp_polling_machine_queue,machine);
     }
     else if(first_char == STRING_SERVER_DELIMITER){
-        uint8_t machine_profile_size = get_machine_stack_size(default_wol_profiles);
+        uint8_t machine_profile_size = get_machine_stack_amount(default_wol_profiles);
         for (size_t i = 0; i < machine_profile_size; i++)
         {
             machine* machine = get_machine_at_index(default_wol_profiles,i);

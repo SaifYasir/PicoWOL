@@ -72,7 +72,6 @@ void sd_card_read_and_initialise_wifi_credentials(){
     default_wifi_credentials = malloc(sizeof(wifi_credential));
     default_wifi_credentials->ssid = parse_csv_line(line,1);
     default_wifi_credentials->ssid_password = parse_csv_line(line,2);
-    default_wifi_credentials->broadcast_address = atoi(parse_csv_line(line,3));
     result = f_close(&wifi_credentials_file);
     if(result != FR_OK){
         printf("Could not close file: %s, reason:  %s \n",FLASH_WIFI_FILENAME,FRESULT_str(result));

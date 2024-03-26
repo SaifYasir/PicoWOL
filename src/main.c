@@ -21,7 +21,7 @@
 #include "flash/flash.h"
 
 /**
- * @brief The introduction message the display shows when starting the PICO
+ * \brief The introduction message the display shows when starting the PICO
  * 
  */
 char *INTRODUCTION_MSG[] = {"Pico","Wake On Lan"};
