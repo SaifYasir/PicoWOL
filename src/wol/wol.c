@@ -133,5 +133,6 @@ machine* create_machine(const char* machine_name, const uint8_t mac_address[6]){
 }
 
 void destroy_machine(machine* machine_to_destroy){
-//cry
+    free(machine_to_destroy->machine_name);
+    free(machine_to_destroy);
 }

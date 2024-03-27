@@ -78,14 +78,35 @@ uint8_t* get_magic_packet_mac_addr(uint8_t* machine_mac, uint8_t* packet);
 machine* create_machine(const char* machine_name, const uint8_t mac_address[6]);
 
 /**
- * @brief NOT IMPLEMENTED
- * \todo Actually make the function
- * @param machine_to_destroy Pointer to the machine to be destroyed and freed
+ * \brief Deallocates and destorys machine instance
+ * \param machine_to_destroy Pointer to the machine to be destroyed and freed
  */
 void destroy_machine(machine* machine_to_destroy);
 
+/**
+ * @brief Pushes a \ref machine to a \ref machine_stackd)
+ * 
+ * @param stack stack to push to, does not need to be initialised (can be nulled)
+ * @param value \ref machine to push to \ref machine_stack
+ * @return machine_stack** Double pointer of passed stack arguement
+ */
 machine_stack** push_to_machine_stack(machine_stack** stack, machine* value);
+
+/**
+ * \brief Pops machine from \ref machine_stack
+ * 
+ * @param stack \ref machine_stack to pop, destroying the stack when the last machine is popped
+ * @return \ref machine pointer that was popped
+ */
 machine* pop_machine_stack(machine_stack** stack);
+
+/**
+ * \brief Get the \ref machine stored at index
+ * 
+ * \param stack \ref machine_stack to search
+ * \param index index of wanted machine, 0 indexed
+ * \return \ref machine pointer stored at index
+ */
 machine* get_machine_at_index(machine_stack* stack, uint8_t index);
 
 /**
