@@ -2,19 +2,10 @@
 
 #include "wol/wol.h"
 
-#include "pico/util/queue.h"
-
 /**
  * \file wifi.h
  * \brief This file specifies functions relating to wifi
  */
-
-/**
- * \def MAX_QUEUE_WOL
- * \todo Remove this
-*/
-#define MAX_QUEUE_WOL            5
-#define QUEUE_SPINLOCK_ID        1
 
 /**
  * \def UDP_PORT_NUMBER
@@ -41,7 +32,7 @@
 /**
  * Add to this stack, then poll to wake up devices
 */
-extern queue_t* default_udp_polling_machine_queue;
+extern machine_stack* default_udp_polling_machine_stack;
 
 /**
  * \brief Starts WIFI connecting procedure
@@ -60,10 +51,31 @@ int start_wifi(wifi_credential* wifi_credential);
  */
 int start_udp_server();
 
-void initialise_polling_queue(queue_t** queue);
-void push_to_polling_queue(queue_t* queue, machine* machine);
-void poll_udp_packets(queue_t* machine_queue);
 
+/**
+ * \brief Checks the stack to see if any machines need to be awoken (a machine is awoken if its in the provided stack)
+ * 
+ * \param machine_polling_stack \ref machine_stack double pointer containing \ref machine to wake
+ */
+void poll_udp_packets(machine_stack** machine_polling_stack);
+
+/**
+ * \brief Returns the port number set for the application via \ref UDP_PORT_NUMBER
+ * 
+ * \return Port number 
+ */
 int pico_get_port_number();
+
+/**
+ * \brief Returns the MAC address for the wifi card onboard the Rasberry Pi Pico
+ * 
+ * \param mac data buffer to copy MAC address into
+ */
 void pico_get_mac_address(uint8_t mac[6]);
+
+/**
+ * \brief Returns the IP address assigned when the Pico is connected to WiFi (via \ref start_wifi)
+ * 
+ * \param data Data buffer to copy string formatted IPV4 address into
+ */
 void pico_get_ip_address(char* data);

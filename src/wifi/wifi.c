@@ -13,7 +13,7 @@
 #include "lwip/ip4.h"
 
 
-queue_t* default_udp_polling_machine_queue;
+machine_stack* default_udp_polling_machine_stack = NULL;
 struct udp_pcb* pcb = NULL;
 
 int send_wol_packet_string(char* mac_address_string);
@@ -47,7 +47,7 @@ void recieve_packet_server(void *arg, struct udp_pcb *pcb, struct pbuf *p, const
         machine* machine = get_machine_at_index(default_wol_profiles,index);
 
         //Add packet to polling thing
-        push_to_polling_queue(default_udp_polling_machine_queue,machine);
+        push_to_machine_stack(&default_udp_polling_machine_stack,machine);
     }
     else if(first_char == STRING_SERVER_DELIMITER){
         uint8_t machine_profile_size = get_machine_stack_amount(default_wol_profiles);
@@ -129,7 +129,7 @@ int send_wol_packet_string(char* mac_address_string){
     printf("Size is %d",sizeof(mac_address) * 2);
     if(hex_string_length != (sizeof(mac_address) * 2)){
        printf("Hex string to byte array invalid input!");
-       return;
+       return 1;
     }
     for(size_t i = 0; i < hex_string_length; i += 2){
         sscanf(mac_address_string + i, "%2hhx", &mac_address[i/2]);
@@ -159,21 +159,11 @@ int send_wol_packet_string(char* mac_address_string){
     return er;
 }
 
-void initialise_polling_queue(queue_t** queue){
-   *queue = malloc(sizeof(machine) * MAX_QUEUE_WOL);
-   queue_init_with_spinlock(*queue,sizeof(machine),MAX_QUEUE_WOL,QUEUE_SPINLOCK_ID);
-}
-
-void push_to_polling_queue(queue_t* queue, machine* machine){
-    queue_try_add(queue,machine);
-}
-
-void poll_udp_packets(queue_t* machine_queue){
-    int queue_size = queue_get_level(machine_queue);
-    for (int i = 0; i < queue_size; i++)
+void poll_udp_packets(machine_stack** machine_polling_stack){
+    int stack_size = get_machine_stack_amount(*machine_polling_stack);
+    for (int i = 0; i < stack_size; i++)
     {
-        machine machine_to_wake;
-        queue_remove_blocking(machine_queue,&machine_to_wake);
-        send_wol_packet(&machine_to_wake);
+        machine* machine_to_wake = pop_machine_stack(machine_polling_stack);
+        send_wol_packet(machine_to_wake);
     }
 }

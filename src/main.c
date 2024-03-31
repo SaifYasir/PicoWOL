@@ -61,9 +61,6 @@ int main(){
     //configure wol list
     sd_card_read_and_initialise_wol_profiles();
 
-    // configure WOL polling queue
-    initialise_polling_queue(&default_udp_polling_machine_queue);
-
     initialise_accept_btn();
     initialise_info_btn();
     initialise_left_btn();
@@ -75,8 +72,6 @@ int main(){
     char* ip_addr = malloc(sizeof(char) * 30);
     pico_get_ip_address(ip_addr);
 
-    printf("Port: %d , mac address: %s, ip address: %s",pico_get_port_number(), mac_addr, ip_addr);
-
     start_udp_server();
 
     // Show introduction message
@@ -87,7 +82,7 @@ int main(){
 
     while(true){
         sleep_ms(1000);
-        poll_udp_packets(default_udp_polling_machine_queue);
+        poll_udp_packets(&default_udp_polling_machine_stack);
     }
 
     clear_machine_stack(&default_wol_profiles);
