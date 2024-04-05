@@ -61,17 +61,8 @@ int main(){
     //configure wol list
     sd_card_read_and_initialise_wol_profiles();
 
-    initialise_accept_btn();
-    initialise_info_btn();
-    initialise_left_btn();
-    initialise_right_btn();
-
-    char* mac_addr = malloc(sizeof(char) * 6);
-    pico_get_mac_address(mac_addr);
-
-    char* ip_addr = malloc(sizeof(char) * 30);
-    pico_get_ip_address(ip_addr);
-
+    initialise_all_buttons();
+    disable_all_buttons();
     start_udp_server();
 
     // Show introduction message
@@ -79,6 +70,7 @@ int main(){
     sleep_ms(1000);
 
     display_wol_profile(NULL);
+    reenable_all_buttons();
 
     while(true){
         sleep_ms(1000);

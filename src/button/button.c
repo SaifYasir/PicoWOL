@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
@@ -9,7 +10,6 @@
 #include "wifi/wifi.h"
 #include "display/api/command.h"
 
-uint8_t BUTTON_FLAG;
 
 void left_btn_callback(void){
     if(gpio_get_irq_event_mask(LEFT_BTN_GPIO) & BTN_BEHAVIOUR_IRQ){
@@ -54,10 +54,17 @@ void info_btn_callback(void){
         gpio_acknowledge_irq(INFO_BTN_GPIO,BTN_BEHAVIOUR_IRQ);
 
         char ip_address_str[16];
+        char port_str[16];
+        char port_int_to_str[10];
+        sprintf(port_int_to_str,"%d",pico_get_port_number());
+        strcpy(port_str,"Port: ");
+        strcat(port_str, port_int_to_str);
         pico_get_ip_address(ip_address_str);
         lcd_clear();
         lcd_set_cursor(0,(LCD_MAX_CHARS/2) - (strlen(ip_address_str) / 2));
         lcd_send_string(ip_address_str);
+        lcd_set_cursor(1,(LCD_MAX_CHARS/2) - (strlen(port_str) / 2));
+        lcd_send_string(port_str);
     }
 }
 
@@ -92,4 +99,11 @@ void reenable_all_buttons(){
     gpio_set_irq_enabled(LEFT_BTN_GPIO,BTN_BEHAVIOUR_IRQ,true);
     gpio_set_irq_enabled(RIGHT_BTN_GPIO,BTN_BEHAVIOUR_IRQ,true);
     gpio_set_irq_enabled(ACCEPT_BTN_GPIO,BTN_BEHAVIOUR_IRQ,true);
+}
+
+void initialise_all_buttons(){
+    initialise_left_btn();
+    initialise_right_btn();
+    initialise_accept_btn();
+    initialise_info_btn();
 }

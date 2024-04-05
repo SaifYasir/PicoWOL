@@ -2,6 +2,14 @@
 #define _LWIPOPTS_EXAMPLE_COMMONH_H
 
 
+/**
+ * \file lwipopts.h
+ * \brief This file enables and configures parts of LWIP implemented in the PICO SDK
+ * 
+ * To read more about LWIP visit <a href="linkhere">LWIP lwipopts.h<a>
+ * \todo provide link to LWIP
+ */
+
 // Common settings used in most of the pico_w examples
 // (see https://www.nongnu.org/lwip/2_1_x/group__lwip__opts.html for details)
 
