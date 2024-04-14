@@ -4,6 +4,8 @@
 
 #include "flash.h"
 
+#include "display/api/command.h"
+
 #include "wol/wol.h"
 
 #include "ff.h"
@@ -37,13 +39,17 @@ void hex_string_to_byte_array(const char* hex_string, uint8_t* byte_array, size_
 void initialise_sd_card(){
     sd_card_t* pSD = sd_get_by_num(0);
     FRESULT mount_result = f_mount(&pSD->fatfs,pSD->pcName,1);
-    if (FR_OK != mount_result) panic("f_mount error: %s (%d)\n", FRESULT_str(mount_result), mount_result);
+    if (FR_OK != mount_result){
+        centre_send_message("SD init","error");
+        panic("f_mount error: %s (%d)\n", FRESULT_str(mount_result), mount_result);
+    }
 }
 
 void sd_card_read_and_initialise_wol_profiles(){
     FIL wol_profiles_file;
     FRESULT result = f_open(&wol_profiles_file,FLASH_WOL_FILENAME,FA_READ);
     if(result != FR_OK){
+        centre_send_message("SD init","error");
         panic("Could not read file: %s, FatFS reported this result: %s \n",FLASH_WIFI_FILENAME,FRESULT_str(result));
     }
     char line[300];

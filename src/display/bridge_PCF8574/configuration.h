@@ -1,5 +1,9 @@
 #pragma once
 
+/**
+ * \file configuration.h
+ * \brief This file specifies structures and methods used for wake-on-lan
+ */
 
 // Commands
 #define LCD_CLEAR_DISPLAY           0x01
