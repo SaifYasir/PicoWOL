@@ -6,7 +6,7 @@ include(pico_sdk_import.cmake)
 
 project(PicoWOL)
 set(PICO_BOARD pico_w)
-set(PICO_DEOPTIMIZED_DEBUG 1)
+#set(PICO_DEOPTIMIZED_DEBUG 1)
 
 pico_sdk_init()
 
